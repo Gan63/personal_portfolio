@@ -1,75 +1,59 @@
 /**
- * script.js — EmailJS Contact Form Integration
+ * script.js
  * ─────────────────────────────────────────────
- * This file handles the "Send Message" form submission
- * using EmailJS (https://www.emailjs.com/) — no backend required.
+ * 1) EmailJS contact form submission (unchanged functionality)
+ * 2) “Hire Me” smooth scroll (unchanged)
+ * 3) Mobile hamburger navigation (new)
  *
- * ╔══════════════════════════════════════════════╗
- * ║  HOW TO SET UP (three values to replace)     ║
- * ╠══════════════════════════════════════════════╣
- * ║  1. YOUR_PUBLIC_KEY  → EmailJS Dashboard     ║
- * ║     Account > API Keys > Public Key          ║
- * ║                                              ║
- * ║  2. YOUR_SERVICE_ID  → EmailJS Dashboard     ║
- * ║     Email Services > (your Gmail service)    ║
- * ║     e.g. "service_abc123"                    ║
- * ║                                              ║
- * ║  3. YOUR_TEMPLATE_ID → EmailJS Dashboard     ║
- * ║     Email Templates > (your template)        ║
- * ║     e.g. "template_xyz456"                   ║
- * ║                                              ║
- * ║  Template variables to use inside EmailJS:   ║
- * ║    {{from_name}}  — sender's name            ║
- * ║    {{reply_to}}   — sender's email           ║
- * ║    {{subject}}    — message subject          ║
- * ║    {{message}}    — message body             ║
- * ╚══════════════════════════════════════════════╝
+ * Note:
+ * - index.html includes EmailJS via CDN and then loads this file.
+ * - EmailJS + nav code are guarded so nothing breaks if elements are missing.
  */
 
-// ─── Step 1: Initialize EmailJS with your Public Key ───────────────────────
-// Replace "YOUR_PUBLIC_KEY" with the actual key from your EmailJS account.
-emailjs.init("O4tObdHpbPI27O947");   // ← REPLACE THIS
+// ─────────────────────────────────────────────
+// EmailJS Contact Form Integration
+// ─────────────────────────────────────────────
 
-// ─── Step 2: Configuration — update both IDs before going live ────────────
-const EMAILJS_SERVICE_ID = "service_wmgxu7m";   // ← REPLACE THIS
-const EMAILJS_TEMPLATE_ID = "template_fkvgeje";  // ← REPLACE THIS
+// Initialize EmailJS with your Public Key
+emailjs.init('O4tObdHpbPI27O947');
 
-// ─── Step 3: DOM references ────────────────────────────────────────────────
-const contactForm = document.getElementById("contact-form");
-const submitBtn = document.getElementById("contact-submit-btn");
+// Configure both IDs before going live
+const EMAILJS_SERVICE_ID = 'service_wmgxu7m';
+const EMAILJS_TEMPLATE_ID = 'template_fkvgeje';
+
+// DOM references
+const contactForm = document.getElementById('contact-form');
+const submitBtn = document.getElementById('contact-submit-btn');
 
 // Guard: exit early if the form element isn't present on this page
 if (!contactForm) {
-  console.warn("script.js: #contact-form not found — skipping EmailJS setup.");
+  console.warn('script.js: #contact-form not found — skipping EmailJS setup.');
 }
 
-// ─── Step 4: Form submission handler ──────────────────────────────────────
+// Form submission handler
 if (contactForm) {
-  contactForm.addEventListener("submit", function (e) {
+  contactForm.addEventListener('submit', function (e) {
     // Prevent the default browser form submission (no page reload)
     e.preventDefault();
 
-    // ── 4a. Basic client-side validation ──────────────────────────────────
-    const name = document.getElementById("from_name").value.trim();
-    const email = document.getElementById("reply_to").value.trim();
-    const subject = document.getElementById("subject").value.trim();
-    const message = document.getElementById("message").value.trim();
+    // Basic client-side validation
+    const name = document.getElementById('from_name').value.trim();
+    const email = document.getElementById('reply_to').value.trim();
+    const subject = document.getElementById('subject').value.trim();
+    const message = document.getElementById('message').value.trim();
 
     if (!name || !email || !subject || !message) {
-      showAlert("error", "⚠️ Please fill in all fields before sending.");
+      showAlert('error', '⚠️ Please fill in all fields before sending.');
       return;
     }
 
     if (!isValidEmail(email)) {
-      showAlert("error", "⚠️ Please enter a valid email address.");
+      showAlert('error', '⚠️ Please enter a valid email address.');
       return;
     }
 
-    // ── 4b. Show loading state on the button ──────────────────────────────
     setButtonLoading(true);
 
-    // ── 4c. Build the template parameters object ───────────────────────────
-    // These keys must exactly match the {{variables}} in your EmailJS template.
     const templateParams = {
       from_name: name,
       reply_to: email,
@@ -77,107 +61,82 @@ if (contactForm) {
       message: message,
     };
 
-    // ── 4d. Send the email via EmailJS ────────────────────────────────────
     emailjs
       .send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
       .then(function (response) {
-        // ✅ SUCCESS — email sent
-        console.log("EmailJS success:", response.status, response.text);
-
-        showAlert(
-          "success",
-          "✅ Message sent successfully! I'll get back to you soon."
-        );
-
-        // Clear the form fields after a successful send
+        console.log('EmailJS success:', response.status, response.text);
+        showAlert('success', "✅ Message sent successfully! I'll get back to you soon.");
         contactForm.reset();
       })
       .catch(function (error) {
-        // ❌ ERROR — log full details to help diagnose
-        console.error("EmailJS error object:", error);
-        console.error("Status:", error.status);
-        console.error("Text:", error.text);
+        console.error('EmailJS error object:', error);
+        console.error('Status:', error.status);
+        console.error('Text:', error.text);
 
-        // Build a human-readable error hint based on the status code
-        let hint = "";
+        let hint = '';
         if (error.status === 412) {
-          hint = " (Gmail needs re-authorization in EmailJS dashboard)";
+          hint = ' (Gmail needs re-authorization in EmailJS dashboard)';
         } else if (error.status === 401 || error.status === 403) {
-          hint = " (Invalid Public Key or Service ID)";
+          hint = ' (Invalid Public Key or Service ID)';
         } else if (error.status === 404) {
-          hint = " (Template ID not found)";
+          hint = ' (Template ID not found)';
         } else if (error.status === 429) {
-          hint = " (Rate limit reached — try again in a minute)";
+          hint = ' (Rate limit reached — try again in a minute)';
         }
 
-        const code = error.status ? ` [Code: ${error.status}${hint}]` : "";
+        const code = error.status ? ` [Code: ${error.status}${hint}]` : '';
         showAlert(
-          "error",
+          'error',
           `❌ Failed to send message.${code} Please email me directly at ganeshskl682002@gmail.com`
         );
       })
       .finally(function () {
-        // Restore button to its original state regardless of outcome
         setButtonLoading(false);
       });
   });
 }
 
-// ─── Helper: email format validation ──────────────────────────────────────
 function isValidEmail(email) {
-  // Standard RFC-compliant email regex
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ─── Helper: toggle button loading state ──────────────────────────────────
 function setButtonLoading(isLoading) {
   if (!submitBtn) return;
+
   if (isLoading) {
     submitBtn.disabled = true;
-    submitBtn.textContent = "Sending…";
-    submitBtn.style.opacity = "0.7";
-    submitBtn.style.cursor = "not-allowed";
+    submitBtn.textContent = 'Sending…';
+    submitBtn.style.opacity = '0.7';
+    submitBtn.style.cursor = 'not-allowed';
   } else {
     submitBtn.disabled = false;
-    submitBtn.textContent = "Send Message →";
-    submitBtn.style.opacity = "1";
-    submitBtn.style.cursor = "none"; // matches site's custom cursor style
+    submitBtn.textContent = 'Send Message →';
+    submitBtn.style.opacity = '1';
+    submitBtn.style.cursor = 'none';
   }
 }
 
-// ─── Helper: show a styled toast alert ────────────────────────────────────
-/**
- * Displays a dismissible toast notification that matches the portfolio's
- * neon-glassmorphism theme.
- *
- * @param {"success"|"error"} type  - Controls the accent colour
- * @param {string}            text  - The message to display
- */
 function showAlert(type, text) {
-  // Remove any existing alert first
-  const existing = document.getElementById("emailjs-alert");
+  const existing = document.getElementById('emailjs-alert');
   if (existing) existing.remove();
 
-  // Colour palette — synced to portfolio CSS variables
   const colors = {
     success: {
-      border: "rgba(15, 255, 179, 0.45)",
-      glow: "rgba(15, 255, 179, 0.15)",
-      icon: "#0fffb3",
+      border: 'rgba(15, 255, 179, 0.45)',
+      glow: 'rgba(15, 255, 179, 0.15)',
     },
     error: {
-      border: "rgba(255, 44, 243, 0.45)",
-      glow: "rgba(255, 44, 243, 0.12)",
-      icon: "#ff2cf3",
+      border: 'rgba(255, 44, 243, 0.45)',
+      glow: 'rgba(255, 44, 243, 0.12)',
     },
   };
+
   const theme = colors[type] || colors.error;
 
-  // Build the alert element
-  const alert = document.createElement("div");
-  alert.id = "emailjs-alert";
-  alert.setAttribute("role", "alert");
-  alert.setAttribute("aria-live", "assertive");
+  const alert = document.createElement('div');
+  alert.id = 'emailjs-alert';
+  alert.setAttribute('role', 'alert');
+  alert.setAttribute('aria-live', 'assertive');
 
   alert.style.cssText = `
     position: fixed;
@@ -202,10 +161,9 @@ function showAlert(type, text) {
     transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   `;
 
-  // Close button
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "×";
-  closeBtn.setAttribute("aria-label", "Dismiss alert");
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '×';
+  closeBtn.setAttribute('aria-label', 'Dismiss alert');
   closeBtn.style.cssText = `
     margin-left: auto;
     background: none;
@@ -217,52 +175,106 @@ function showAlert(type, text) {
     line-height: 1;
     flex-shrink: 0;
   `;
-  closeBtn.addEventListener("click", () => dismissAlert(alert));
 
-  // Text node
-  const msgSpan = document.createElement("span");
+  closeBtn.addEventListener('click', () => dismissAlert(alert));
+
+  const msgSpan = document.createElement('span');
   msgSpan.textContent = text;
 
   alert.appendChild(msgSpan);
   alert.appendChild(closeBtn);
   document.body.appendChild(alert);
 
-  // Slide in
   requestAnimationFrame(() => {
-    alert.style.transform = "translateX(0)";
+    alert.style.transform = 'translateX(0)';
   });
 
-  // Auto-dismiss after 6 seconds
   setTimeout(() => dismissAlert(alert), 6000);
 }
 
-// ─── Helper: slide-out and remove the alert ────────────────────────────────
 function dismissAlert(alertEl) {
   if (!alertEl || !alertEl.parentNode) return;
-  alertEl.style.transform = "translateX(calc(100% + 2rem))";
+  alertEl.style.transform = 'translateX(calc(100% + 2rem))';
   setTimeout(() => {
     if (alertEl.parentNode) alertEl.parentNode.removeChild(alertEl);
   }, 400);
 }
 
-// ─── "Hire Me" nav button → smooth scroll to #contact ─────────────────────
-const hireMeBtn = document.getElementById("hire-me-btn");
-const contactSection = document.getElementById("contact");
+// ─────────────────────────────────────────────
+// “Hire Me” nav button → smooth scroll
+// ─────────────────────────────────────────────
+
+const hireMeBtn = document.getElementById('hire-me-btn');
+const contactSection = document.getElementById('contact');
 
 if (hireMeBtn && contactSection) {
-  hireMeBtn.addEventListener("click", function (e) {
-    e.preventDefault(); // stop the default anchor jump
+  hireMeBtn.addEventListener('click', function (e) {
+    e.preventDefault();
 
-    // Offset by navbar height (~72px) so the heading isn't hidden behind nav
-    const navHeight = document.querySelector("nav")
-      ? document.querySelector("nav").offsetHeight
-      : 72;
+    const navEl = document.querySelector('nav');
+    const navHeight = navEl ? navEl.offsetHeight : 72;
 
     const targetY =
-      contactSection.getBoundingClientRect().top +
-      window.scrollY -
-      navHeight;
+      contactSection.getBoundingClientRect().top + window.scrollY - navHeight;
 
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
   });
 }
+
+// ─────────────────────────────────────────────
+// Mobile hamburger navigation (new)
+// ─────────────────────────────────────────────
+
+(function initMobileNav() {
+  const hamburger = document.getElementById('nav-hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  if (!hamburger || !mobileNav) return;
+
+  const links = mobileNav.querySelectorAll('a');
+
+  function openNav() {
+    mobileNav.classList.add('open');
+    mobileNav.setAttribute('aria-hidden', 'false');
+    hamburger.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeNav() {
+    mobileNav.classList.remove('open');
+    mobileNav.setAttribute('aria-hidden', 'true');
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.contains('open');
+    if (isOpen) closeNav();
+    else openNav();
+  });
+
+  links.forEach((a) => {
+    a.addEventListener('click', (e) => {
+      // Let the anchor jump work (smooth scrolling is handled by CSS scroll-behavior)
+      closeNav();
+    });
+  });
+
+  // Close when clicking outside the nav panel
+  document.addEventListener('click', (e) => {
+    const isOpen = mobileNav.classList.contains('open');
+    if (!isOpen) return;
+
+    const clickedInside = mobileNav.contains(e.target);
+    const clickedHamburger = hamburger.contains(e.target);
+
+    if (!clickedInside && !clickedHamburger) closeNav();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileNav.classList.contains('open')) {
+      closeNav();
+      hamburger.focus();
+    }
+  });
+})();
+

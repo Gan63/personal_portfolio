@@ -2,1374 +2,20 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ganesh A — Data Scientist & AI Engineer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" />
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <!-- EmailJS CDN — required for sending emails directly from the browser -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <style>
-    :root {
-      --neon-blue: #00d4ff;
-      --neon-purple: #b44aff;
-      --neon-pink: #ff2cf3;
-      --neon-cyan: #0fffb3;
-      --deep-bg: #03040d;
-      --panel-bg: rgba(6, 10, 30, 0.78);
-      --glass-border: rgba(100, 160, 255, 0.16);
-      --text-bright: #e8f0ff;
-      --text-muted: rgba(180, 200, 255, 0.52);
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--deep-bg);
-      color: var(--text-bright);
-      font-family: 'DM Mono', monospace;
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 12px;
-      height: 12px;
-      background: var(--neon-blue);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      box-shadow: 0 0 15px var(--neon-blue), 0 0 40px rgba(0, 212, 255, 0.3);
-    }
-
-    .cursor-ring {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(0, 212, 255, 0.4);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transition: transform 0.12s;
-    }
-
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .scan-line {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 212, 255, 0.01) 2px, rgba(0, 212, 255, 0.01) 4px);
-    }
-
-    ::-webkit-scrollbar {
-      width: 3px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #060a1e;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(var(--neon-blue), var(--neon-purple));
-      border-radius: 3px;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      padding: 1.2rem 4rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(3, 4, 13, 0.7);
-      backdrop-filter: blur(24px);
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    .nav-logo {
-      font-family: 'Oxanium', sans-serif;
-      font-weight: 800;
-      font-size: 1.2rem;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 0.06em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.68rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: color 0.3s;
-      position: relative;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--neon-blue);
-      transform: scaleX(0);
-      transition: transform 0.3s;
-    }
-
-    .nav-links a:hover {
-      color: var(--neon-blue);
-    }
-
-    .nav-links a:hover::after {
-      transform: scaleX(1);
-    }
-
-    .nav-cta {
-      padding: 0.45rem 1.2rem;
-      border: 1px solid var(--neon-blue);
-      color: var(--neon-blue);
-      background: rgba(0, 212, 255, 0.05);
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: none;
-      transition: all 0.3s;
-      text-decoration: none;
-    }
-
-    .nav-cta:hover {
-      background: rgba(0, 212, 255, 0.12);
-      box-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
-    }
-
-    /* WRAPPER */
-    .page {
-      position: relative;
-      z-index: 10;
-      max-width: 1360px;
-      margin: 0 auto;
-    }
-
-    section {
-      padding: 6rem 4rem;
-    }
-
-    @media(max-width:900px) {
-      nav {
-        padding: 1rem 1.5rem;
-      }
-
-      section {
-        padding: 4rem 1.5rem;
-      }
-
-      .hero-layout {
-        flex-direction: column !important;
-      }
-
-      .hero-right {
-        display: none !important;
-      }
-
-      .skills-grid,
-      .projects-grid,
-      .cert-grid {
-        grid-template-columns: 1fr !important;
-      }
-
-      .contact-wrap {
-        grid-template-columns: 1fr !important;
-      }
-
-      .dashboard-grid {
-        grid-template-columns: 1fr 1fr !important;
-      }
-
-      .span2,
-      .span3 {
-        grid-column: span 2 !important;
-      }
-    }
-
-    /* HERO */
-    .hero-layout {
-      display: flex;
-      align-items: center;
-      gap: 4rem;
-      min-height: 100vh;
-      padding-top: 7rem;
-      padding-bottom: 3rem;
-    }
-
-    .hero-left {
-      flex: 1.2;
-    }
-
-    .hero-right {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    /* PHOTO */
-    .photo-frame {
-      position: relative;
-      width: 320px;
-      height: 320px;
-    }
-
-    .photo-hexagon {
-      width: 300px;
-      height: 300px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      padding: 3px;
-    }
-
-    .photo-hexagon-inner {
-      width: 100%;
-      height: 100%;
-      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-      background: var(--deep-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .photo-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(180, 74, 255, 0.08));
-      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-    }
-
-    .photo-initials {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .photo-initial-sub {
-      font-size: 0.6rem;
-      letter-spacing: 0.35em;
-      color: var(--neon-blue);
-      text-transform: uppercase;
-      margin-top: 0.3rem;
-    }
-
-    .photo-upload-note {
-      font-size: 0.55rem;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-      text-align: center;
-      padding: 0 1rem;
-    }
-
-    .orbit-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 212, 255, 0.15);
-    }
-
-    .orbit-ring.r1 {
-      inset: -20px;
-      animation: orbitSpin 18s linear infinite;
-    }
-
-    .orbit-ring.r2 {
-      inset: -45px;
-      animation: orbitSpin 30s linear infinite reverse;
-      border-color: rgba(180, 74, 255, 0.1);
-    }
-
-    .orbit-ring.r3 {
-      inset: -70px;
-      border-style: dashed;
-      border-color: rgba(0, 212, 255, 0.07);
-      animation: orbitSpin 45s linear infinite;
-    }
-
-    .orbit-dot {
-      position: absolute;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-    }
-
-    .orbit-dot.blue {
-      background: var(--neon-blue);
-      box-shadow: 0 0 12px var(--neon-blue);
-    }
-
-    .orbit-dot.purple {
-      background: var(--neon-purple);
-      box-shadow: 0 0 12px var(--neon-purple);
-    }
-
-    @keyframes orbitSpin {
-      from {
-        transform: rotate(0deg);
-      }
-
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Floating stat badges */
-    .stat-badge {
-      position: absolute;
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(16px);
-      padding: 0.8rem 1.1rem;
-      animation: floatBadge 5s ease-in-out infinite;
-    }
-
-    .stat-badge.b1 {
-      top: -10px;
-      right: -30px;
-      animation-delay: 0s;
-    }
-
-    .stat-badge.b2 {
-      bottom: 0px;
-      right: -50px;
-      animation-delay: -1.8s;
-    }
-
-    .stat-badge.b3 {
-      bottom: 20px;
-      left: -60px;
-      animation-delay: -3.5s;
-    }
-
-    @keyframes floatBadge {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    .badge-val {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--neon-blue);
-    }
-
-    .badge-val.purple {
-      color: var(--neon-purple);
-    }
-
-    .badge-val.cyan {
-      color: var(--neon-cyan);
-    }
-
-    .badge-lbl {
-      font-size: 0.58rem;
-      color: var(--text-muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-top: 0.1rem;
-    }
-
-    /* HERO TEXT */
-    .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--neon-cyan);
-      margin-bottom: 1.4rem;
-      padding: 0.35rem 0.9rem;
-      border: 1px solid rgba(15, 255, 179, 0.22);
-      background: rgba(15, 255, 179, 0.05);
-    }
-
-    .hero-tag::before {
-      content: '';
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 8px var(--neon-cyan);
-      animation: blink 2s infinite;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.3;
-      }
-    }
-
-    .hero-name {
-      font-family: 'Oxanium', sans-serif;
-      font-size: clamp(3rem, 6.5vw, 5.8rem);
-      font-weight: 800;
-      line-height: 1.0;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.4rem;
-    }
-
-    .hero-name .n1 {
-      color: var(--text-bright);
-    }
-
-    .hero-name .n2 {
-      background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 60%, var(--neon-pink) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: block;
-    }
-
-    .hero-role {
-      font-size: 0.72rem;
-      letter-spacing: 0.22em;
-      color: var(--text-muted);
-      margin-bottom: 1.8rem;
-      text-transform: uppercase;
-    }
-
-    .hero-desc {
-      font-size: 0.84rem;
-      line-height: 1.85;
-      color: rgba(180, 200, 255, 0.68);
-      max-width: 520px;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero-btns {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .btn-pri {
-      padding: 0.85rem 2rem;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      color: #fff;
-      font-family: 'Oxanium', sans-serif;
-      font-weight: 700;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      border: none;
-      cursor: none;
-      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-pri:hover {
-      box-shadow: 0 0 30px rgba(0, 212, 255, 0.45);
-      transform: translateY(-2px);
-    }
-
-    .btn-out {
-      padding: 0.85rem 2rem;
-      background: transparent;
-      color: var(--neon-purple);
-      font-family: 'Oxanium', sans-serif;
-      font-weight: 600;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      border: 1px solid rgba(180, 74, 255, 0.45);
-      cursor: none;
-      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-out:hover {
-      background: rgba(180, 74, 255, 0.09);
-      box-shadow: 0 0 25px rgba(180, 74, 255, 0.3);
-    }
-
-    .hero-divider {
-      display: flex;
-      gap: 2.5rem;
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .hs-num {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hs-lbl {
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-top: 0.15rem;
-    }
-
-    /* SECTION HEADER */
-    .sh {
-      margin-bottom: 3.5rem;
-    }
-
-    .sh-eye {
-      font-size: 0.62rem;
-      letter-spacing: 0.35em;
-      color: var(--neon-blue);
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.7rem;
-    }
-
-    .sh-eye::before {
-      content: '//';
-      color: var(--neon-purple);
-    }
-
-    .sh-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .sh-title span {
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* GLASS */
-    .glass {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-    }
-
-    /* ABOUT STRIP */
-    .about-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      border: 1px solid var(--glass-border);
-      overflow: hidden;
-    }
-
-    .about-cell {
-      background: var(--panel-bg);
-      padding: 1.8rem 1.5rem;
-      backdrop-filter: blur(20px);
-      text-align: center;
-      transition: background 0.3s;
-    }
-
-    .about-cell:hover {
-      background: rgba(0, 212, 255, 0.06);
-    }
-
-    .ac-icon {
-      font-size: 1.8rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .ac-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-bright);
-      margin-bottom: 0.4rem;
-    }
-
-    .ac-val {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    /* PROJECTS */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 1.4rem;
-    }
-
-    .proj-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      padding: 1.8rem;
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-    }
-
-    .proj-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-
-    .proj-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(0, 212, 255, 0.32);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 40px rgba(0, 212, 255, 0.07);
-    }
-
-    .proj-card:hover::before {
-      opacity: 1;
-    }
-
-    .proj-num {
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
-      color: var(--neon-blue);
-      opacity: 0.6;
-      margin-bottom: 0.8rem;
-    }
-
-    .proj-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 0.7rem;
-      line-height: 1.3;
-      color: var(--text-bright);
-      text-decoration: none;
-      display: block;
-      transition: color 0.3s;
-      cursor: none;
-    }
-
-    a.proj-title:hover {
-      color: var(--neon-cyan);
-    }
-
-    .proj-stack {
-      font-size: 0.62rem;
-      color: var(--neon-purple);
-      letter-spacing: 0.1em;
-      margin-bottom: 0.8rem;
-    }
-
-    .proj-desc {
-      font-size: 0.74rem;
-      line-height: 1.8;
-      color: var(--text-muted);
-      margin-bottom: 1.2rem;
-    }
-
-    .proj-bullets {
-      list-style: none;
-      margin-bottom: 1.3rem;
-    }
-
-    .proj-bullets li {
-      font-size: 0.7rem;
-      line-height: 1.7;
-      color: rgba(180, 200, 255, 0.6);
-      padding-left: 1rem;
-      position: relative;
-      margin-bottom: 0.25rem;
-    }
-
-    .proj-bullets li::before {
-      content: '›';
-      position: absolute;
-      left: 0;
-      color: var(--neon-blue);
-    }
-
-    .proj-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .tag {
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.25rem 0.65rem;
-      background: rgba(0, 212, 255, 0.06);
-      border: 1px solid rgba(0, 212, 255, 0.18);
-      color: var(--neon-blue);
-    }
-
-    .tag.p {
-      background: rgba(180, 74, 255, 0.06);
-      border-color: rgba(180, 74, 255, 0.18);
-      color: var(--neon-purple);
-    }
-
-    .tag.c {
-      background: rgba(15, 255, 179, 0.06);
-      border-color: rgba(15, 255, 179, 0.18);
-      color: var(--neon-cyan);
-    }
-
-    .proj-metrics {
-      display: flex;
-      gap: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .pm {
-      text-align: center;
-    }
-
-    .pm-v {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--neon-blue);
-    }
-
-    .pm-l {
-      font-size: 0.55rem;
-      color: var(--text-muted);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* SKILLS */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.4rem;
-    }
-
-    .sk-cat {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      padding: 1.8rem;
-    }
-
-    .sk-cat-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.28em;
-      color: var(--neon-purple);
-      text-transform: uppercase;
-      margin-bottom: 1.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-
-    .sk-cat-title::before {
-      content: '';
-      width: 20px;
-      height: 1px;
-      background: var(--neon-purple);
-    }
-
-    .sk-row {
-      margin-bottom: 1.1rem;
-    }
-
-    .sk-head {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.4rem;
-    }
-
-    .sk-name {
-      font-size: 0.7rem;
-      color: var(--text-bright);
-    }
-
-    .sk-pct {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.62rem;
-      color: var(--neon-blue);
-    }
-
-    .sk-track {
-      height: 2px;
-      background: rgba(255, 255, 255, 0.06);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sk-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-      transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
-      box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
-    }
-
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-      gap: 0.7rem;
-      margin-top: 1.4rem;
-    }
-
-    .tech-item {
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid var(--glass-border);
-      padding: 0.75rem 0.4rem;
-      text-align: center;
-      font-size: 0.58rem;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      transition: all 0.3s;
-      cursor: none;
-    }
-
-    .tech-item:hover {
-      background: rgba(0, 212, 255, 0.07);
-      border-color: rgba(0, 212, 255, 0.3);
-      color: var(--neon-blue);
-      box-shadow: 0 0 18px rgba(0, 212, 255, 0.08);
-    }
-
-    .tech-icon {
-      font-size: 1.3rem;
-      margin-bottom: 0.35rem;
-      display: block;
-    }
-
-    /* DASHBOARD */
-    .db-wrap {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 5rem 4rem;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1.1rem;
-    }
-
-    .dp {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      padding: 1.4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .dp.span2 {
-      grid-column: span 2;
-    }
-
-    .dp.span3 {
-      grid-column: span 3;
-    }
-
-    .dp-lbl {
-      font-size: 0.58rem;
-      letter-spacing: 0.22em;
-      color: var(--neon-blue);
-      text-transform: uppercase;
-      margin-bottom: 0.3rem;
-    }
-
-    .dp-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.8rem;
-      color: var(--text-bright);
-    }
-
-    .dp-val {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .dp-trend {
-      font-size: 0.62rem;
-      color: var(--neon-cyan);
-      margin-top: 0.25rem;
-    }
-
-    /* EXPERIENCE */
-    .exp-timeline {
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .exp-timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), transparent);
-    }
-
-    .exp-item {
-      position: relative;
-      margin-bottom: 2.5rem;
-      padding-left: 1.5rem;
-    }
-
-    .exp-item::before {
-      content: '';
-      position: absolute;
-      left: -2.4rem;
-      top: 0.4rem;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--neon-blue);
-      box-shadow: 0 0 12px var(--neon-blue);
-    }
-
-    .exp-date {
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      color: var(--neon-purple);
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
-    }
-
-    .exp-role {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-bright);
-      margin-bottom: 0.2rem;
-    }
-
-    .exp-company {
-      font-size: 0.72rem;
-      color: var(--neon-blue);
-      margin-bottom: 0.8rem;
-    }
-
-    .exp-bullets {
-      list-style: none;
-    }
-
-    .exp-bullets li {
-      font-size: 0.72rem;
-      line-height: 1.75;
-      color: var(--text-muted);
-      padding-left: 1rem;
-      position: relative;
-      margin-bottom: 0.3rem;
-    }
-
-    .exp-bullets li::before {
-      content: '▸';
-      position: absolute;
-      left: 0;
-      color: var(--neon-blue);
-    }
-
-    /* EDUCATION */
-    .edu-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-    }
-
-    .edu-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      padding: 1.8rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s;
-    }
-
-    .edu-card:hover {
-      border-color: rgba(0, 212, 255, 0.3);
-      transform: translateY(-4px);
-    }
-
-    .edu-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-    }
-
-    .edu-degree {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-
-    .edu-short {
-      font-size: 0.7rem;
-      color: var(--neon-blue);
-      margin-bottom: 0.6rem;
-      letter-spacing: 0.1em;
-    }
-
-    .edu-college {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-bottom: 0.4rem;
-    }
-
-    .edu-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      margin-top: 0.8rem;
-      padding-top: 0.8rem;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .edu-cgpa {
-      font-family: 'Oxanium', sans-serif;
-      color: var(--neon-cyan);
-      font-weight: 700;
-    }
-
-    /* CERTS */
-    .cert-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.1rem;
-    }
-
-    .cert-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      padding: 1.6rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s;
-      cursor: none;
-    }
-
-    .cert-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.4s;
-    }
-
-    .cert-card:hover {
-      border-color: rgba(180, 74, 255, 0.3);
-      transform: translateY(-4px);
-    }
-
-    .cert-card:hover::after {
-      transform: scaleX(1);
-    }
-
-    .cert-badge {
-      position: absolute;
-      top: 1.4rem;
-      right: 1.4rem;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      border: 1px solid var(--glass-border);
-      background: rgba(180, 74, 255, 0.1);
-    }
-
-    .cert-issuer {
-      font-size: 0.58rem;
-      letter-spacing: 0.22em;
-      color: var(--neon-purple);
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .cert-name {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-      line-height: 1.3;
-    }
-
-    .cert-skills {
-      font-size: 0.62rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 0.4rem;
-    }
-
-    .cert-date {
-      font-size: 0.6rem;
-      color: rgba(180, 200, 255, 0.35);
-    }
-
-    /* CONTACT */
-    .contact-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-
-    .ct-title {
-      font-family: 'Oxanium', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 0.8rem;
-    }
-
-    .ct-title span {
-      color: var(--neon-blue);
-    }
-
-    .ct-desc {
-      font-size: 0.78rem;
-      line-height: 1.85;
-      color: var(--text-muted);
-      margin-bottom: 1.8rem;
-    }
-
-    .ct-link {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 0.9rem;
-      transition: color 0.3s;
-      cursor: none;
-    }
-
-    .ct-link:hover {
-      color: var(--neon-blue);
-    }
-
-    .ct-icon {
-      width: 34px;
-      height: 34px;
-      border: 1px solid var(--glass-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-      transition: all 0.3s;
-    }
-
-    .ct-link:hover .ct-icon {
-      border-color: var(--neon-blue);
-      background: rgba(0, 212, 255, 0.07);
-      box-shadow: 0 0 14px rgba(0, 212, 255, 0.18);
-    }
-
-    .cf {
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .fl {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--neon-blue);
-      text-transform: uppercase;
-    }
-
-    .fi,
-    .ft {
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid var(--glass-border);
-      color: var(--text-bright);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      padding: 0.75rem 0.9rem;
-      outline: none;
-      transition: all 0.3s;
-      resize: none;
-    }
-
-    .fi:focus,
-    .ft:focus {
-      border-color: rgba(0, 212, 255, 0.45);
-      background: rgba(0, 212, 255, 0.03);
-      box-shadow: 0 0 12px rgba(0, 212, 255, 0.08);
-    }
-
-    .ft {
-      min-height: 120px;
-    }
-
-    .fs {
-      padding: 0.9rem;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      color: #fff;
-      font-family: 'Oxanium', sans-serif;
-      font-weight: 700;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      border: none;
-      cursor: none;
-      transition: all 0.3s;
-      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-    }
-
-    .fs:hover {
-      box-shadow: 0 0 35px rgba(0, 212, 255, 0.4);
-      transform: translateY(-2px);
-    }
-
-    footer {
-      position: relative;
-      z-index: 10;
-      padding: 1.8rem 4rem;
-      border-top: 1px solid var(--glass-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ft-copy {
-      font-size: 0.62rem;
-      color: var(--text-muted);
-    }
-
-    .ft-brand {
-      font-family: 'Oxanium', sans-serif;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 0.95rem;
-    }
-
-    /* ANIM */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .photo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-    }
-  </style>
 </head>
 
 <body>
@@ -1379,9 +25,14 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
+  <a class="skip-link" href="#about">Skip to content</a>
+
+
   <!-- NAV -->
   <nav>
     <div class="nav-logo">GANESH.A</div>
+
+    <!-- Desktop links -->
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
@@ -1390,8 +41,30 @@
       <li><a href="#certifications">Certs</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
+
+    <!-- Mobile hamburger -->
+    <button class="hamburger" id="nav-hamburger" type="button" aria-label="Open navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Desktop CTA -->
     <a href="#contact" class="nav-cta" id="hire-me-btn">Hire Me</a>
+
+    <!-- Mobile nav panel -->
+    <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#certifications">Certs</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
   </nav>
+
 
   <div class="page">
 
@@ -1449,11 +122,19 @@
 
             <div class="photo-hexagon">
               <div class="photo-hexagon-inner" id="photoContainer">
-                <img id="photoImg" class="photo-img" src="portfolio.jpeg" style="display:block;" alt="Ganesh A" />
+                <img
+                  id="photoImg"
+                  class="photo-img"
+                  src="portfolio.jpeg"
+                  style="display:block;"
+                  alt="Ganesh A"
+                  loading="lazy"
+                  decoding="async"
+                  sizes="(max-width: 480px) 270px, (max-width: 768px) 300px, 320px"
+                />
               </div>
+
             </div>
-
-
 
             <!-- Stat badges -->
             <div class="stat-badge b1 glass">
@@ -1534,7 +215,7 @@
               <div class="pm-l">KPI Widgets</div>
             </div>
             <div class="pm">
-              <div class="pm-v">&lt;1s</div>
+              <div class="pm-v"><1s</div>
               <div class="pm-l">Refresh</div>
             </div>
             <div class="pm">
@@ -1616,7 +297,7 @@
         <!-- Project 4 -->
         <div class="proj-card fade-in">
           <div class="proj-num">04 // Predictive ML</div>
-          <a href=" https://bangalore-house-price-prediction-sddr.onrender.com/" class="proj-title">Bangalore House
+          <a href="https://bangalore-house-price-prediction-sddr.onrender.com/" class="proj-title">Bangalore House
             Price Prediction</a>
           <div class="proj-stack">Python · Scikit-learn · Pandas · NumPy · Matplotlib</div>
           <ul class="proj-bullets">
@@ -1624,8 +305,7 @@
               (outlier removal, one-hot encoding, dimensionality reduction), boosting model input quality by 35%.</li>
             <li>Trained & evaluated regression models (Linear, Lasso, Decision Tree) via cross-validation, achieving R²
               of 0.87 across 40+ localities.</li>
-            <li>Optimized model performance using hyperparameter tuning & feature selection for consistency on unseen
-              data.</li>
+            <li>Optimized model performance using hyperparameter tuning & feature selection for consistency on unseen data.</li>
           </ul>
           <div class="proj-tags">
             <span class="tag p">Regression</span>
@@ -1733,77 +413,48 @@
         <div class="sk-cat">
           <div class="sk-cat-title">Data Science & ML</div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Python (Pandas, NumPy, Scikit-learn)</span><span
-                class="sk-pct">95%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="95%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Python (Pandas, NumPy, Scikit-learn)</span><span class="sk-pct">95%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="95%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Machine Learning & Predictive Modeling</span><span
-                class="sk-pct">88%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="88%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Machine Learning & Predictive Modeling</span><span class="sk-pct">88%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="88%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">EDA & Statistical Analysis</span><span class="sk-pct">90%</span>
-            </div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="90%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">EDA & Statistical Analysis</span><span class="sk-pct">90%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="90%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Computer Vision (YOLOv8, OpenCV)</span><span
-                class="sk-pct">82%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="82%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Computer Vision (YOLOv8, OpenCV)</span><span class="sk-pct">82%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="82%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">NLP & RAG Systems (LangChain, FAISS)</span><span
-                class="sk-pct">80%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="80%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">NLP & RAG Systems (LangChain, FAISS)</span><span class="sk-pct">80%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="80%"></div></div>
           </div>
         </div>
+
         <div class="sk-cat">
           <div class="sk-cat-title">Data Engineering & BI</div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">SQL (MySQL, SQLite, Window Functions)</span><span
-                class="sk-pct">92%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="92%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">SQL (MySQL, SQLite, Window Functions)</span><span class="sk-pct">92%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="92%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Power BI (DAX, Data Modeling)</span><span
-                class="sk-pct">88%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="88%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Power BI (DAX, Data Modeling)</span><span class="sk-pct">88%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="88%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Data Visualization (Plotly, Seaborn, Matplotlib)</span><span
-                class="sk-pct">90%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="90%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Data Visualization (Plotly, Seaborn, Matplotlib)</span><span class="sk-pct">90%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="90%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">Streamlit Dashboard Development</span><span
-                class="sk-pct">85%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="85%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">Streamlit Dashboard Development</span><span class="sk-pct">85%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="85%"></div></div>
           </div>
           <div class="sk-row">
-            <div class="sk-head"><span class="sk-name">ETL Pipelines & Query Optimization</span><span
-                class="sk-pct">80%</span></div>
-            <div class="sk-track">
-              <div class="sk-fill" data-w="80%"></div>
-            </div>
+            <div class="sk-head"><span class="sk-name">ETL Pipelines & Query Optimization</span><span class="sk-pct">80%</span></div>
+            <div class="sk-track"><div class="sk-fill" data-w="80%"></div></div>
           </div>
         </div>
       </div>
@@ -1921,7 +572,7 @@
           <div class="edu-short">MCA</div>
           <div class="edu-college">KIT – Kalaignarkarunanidhi Institute of Technology</div>
           <div class="edu-meta">
-            <span>2024 – 2026 (Ongoing)</span>
+            <span>2024 – 2026</span>
             <span class="edu-cgpa">CGPA: 7.5 / 10</span>
           </div>
         </div>
@@ -1991,8 +642,7 @@
             <div class="ct-icon">📞</div>
             +91-9566441381
           </a>
-          <a href="https://www.linkedin.com/in/ganesh68?utm_source=share_via&utm_content=profile&utm_medium=member_android"
-            class="ct-link">
+          <a href="www.linkedin.com/in/ganesh68" class="ct-link">
             <div class="ct-icon">💼</div>
             LinkedIn Profile
           </a>
@@ -2000,6 +650,7 @@
             <div class="ct-icon">🐙</div>
             GitHub Profile
           </a>
+
           <div style="margin-top:2rem;padding:1.2rem;background:var(--panel-bg);border:1px solid var(--glass-border);">
             <div
               style="font-size:0.58rem;letter-spacing:0.22em;color:var(--neon-cyan);text-transform:uppercase;margin-bottom:0.5rem;">
@@ -2009,19 +660,18 @@
               roles</div>
           </div>
         </div>
+
         <div>
           <div class="glass" style="padding:1.8rem;">
             <!-- Contact form — id="contact-form" is used by script.js for EmailJS submission -->
             <form id="contact-form" class="cf" novalidate>
               <div>
                 <label class="fl" for="from_name">Your Name</label>
-                <!-- name="from_name" must match the variable in your EmailJS template -->
                 <input id="from_name" name="from_name" class="fi" type="text" placeholder="Your name" required
                   style="width:100%;">
               </div>
               <div>
                 <label class="fl" for="reply_to">Email</label>
-                <!-- name="reply_to" lets EmailJS auto-set Reply-To in the email -->
                 <input id="reply_to" name="reply_to" class="fi" type="email" placeholder="your@email.com" required
                   style="width:100%;">
               </div>
@@ -2032,7 +682,6 @@
               </div>
               <div>
                 <label class="fl" for="message">Message</label>
-                <!-- name="message" must match the variable in your EmailJS template -->
                 <textarea id="message" name="message" class="ft"
                   placeholder="Tell me about your project or opportunity..." required style="width:100%;"></textarea>
               </div>
@@ -2058,107 +707,198 @@
     let mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
     (function anim() {
+      if (!cur || !ring) return;
       cur.style.transform = `translate(${mx - 6}px,${my - 6}px)`;
       rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
       ring.style.transform = `translate(${rx - 18}px,${ry - 18}px)`;
       requestAnimationFrame(anim);
     })();
 
-    // Three.js
+    // Three.js background
     const cv = document.getElementById('bg-canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setSize(innerWidth, innerHeight);
-    const scene = new THREE.Scene();
-    const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
-    cam.position.z = 30;
-    const N = 1000;
-    const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      pos[i * 3] = (Math.random() - .5) * 120;
-      pos[i * 3 + 1] = (Math.random() - .5) * 120;
-      pos[i * 3 + 2] = (Math.random() - .5) * 80;
-      const t = Math.random();
-      col[i * 3] = t < .5 ? 0 : .7; col[i * 3 + 1] = t < .5 ? .83 : .29; col[i * 3 + 2] = 1;
+    if (cv && window.THREE) {
+      const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+
+      const scene = new THREE.Scene();
+      const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
+      cam.position.z = 30;
+
+      const N = 1000;
+      const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        pos[i * 3] = (Math.random() - .5) * 120;
+        pos[i * 3 + 1] = (Math.random() - .5) * 120;
+        pos[i * 3 + 2] = (Math.random() - .5) * 80;
+        const t = Math.random();
+        col[i * 3] = t < .5 ? 0 : .7;
+        col[i * 3 + 1] = t < .5 ? .83 : .29;
+        col[i * 3 + 2] = 1;
+      }
+
+      const pg = new THREE.BufferGeometry();
+      pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+      const pts = new THREE.Points(pg, new THREE.PointsMaterial({ size: .22, vertexColors: true, transparent: true, opacity: .55 }));
+      scene.add(pts);
+
+      const grid = new THREE.GridHelper(100, 28, 0x0a1a3a, 0x050d20);
+      grid.position.y = -20; scene.add(grid);
+
+      const tg = new THREE.TorusKnotGeometry(7, 1.2, 100, 14);
+      const tm = new THREE.MeshBasicMaterial({ color: 0x0033cc, wireframe: true, transparent: true, opacity: .04 });
+      const tor = new THREE.Mesh(tg, tm); tor.position.x = 16; scene.add(tor);
+
+      const ig = new THREE.IcosahedronGeometry(5, 1);
+      const im = new THREE.MeshBasicMaterial({ color: 0x5500cc, wireframe: true, transparent: true, opacity: .05 });
+      const ico = new THREE.Mesh(ig, im); ico.position.set(-16, 8, 0); scene.add(ico);
+
+      let sc = 0, m3 = { x: 0, y: 0 };
+      window.addEventListener('scroll', () => sc = scrollY);
+      document.addEventListener('mousemove', e => {
+        m3.x = (e.clientX / innerWidth - .5) * 2;
+        m3.y = -(e.clientY / innerHeight - .5) * 2;
+      });
+
+      window.addEventListener('resize', () => {
+        cam.aspect = innerWidth / innerHeight;
+        cam.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+
+      (function a3() {
+        requestAnimationFrame(a3);
+        const t = Date.now() * .001;
+        pts.rotation.y = t * .04;
+        pts.rotation.x = t * .015;
+        tor.rotation.x = t * .28;
+        tor.rotation.y = t * .46;
+        ico.rotation.x = t * .18;
+        ico.rotation.y = t * .32;
+        cam.position.y = -sc * .01;
+        cam.position.x = m3.x * 1.2;
+        cam.lookAt(scene.position);
+        renderer.render(scene, cam);
+      })();
     }
-    const pg = new THREE.BufferGeometry();
-    pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ size: .22, vertexColors: true, transparent: true, opacity: .55 }));
-    scene.add(pts);
-    const grid = new THREE.GridHelper(100, 28, 0x0a1a3a, 0x050d20);
-    grid.position.y = -20; scene.add(grid);
-    const tg = new THREE.TorusKnotGeometry(7, 1.2, 100, 14);
-    const tm = new THREE.MeshBasicMaterial({ color: 0x0033cc, wireframe: true, transparent: true, opacity: .04 });
-    const tor = new THREE.Mesh(tg, tm); tor.position.x = 16; scene.add(tor);
-    const ig = new THREE.IcosahedronGeometry(5, 1);
-    const im = new THREE.MeshBasicMaterial({ color: 0x5500cc, wireframe: true, transparent: true, opacity: .05 });
-    const ico = new THREE.Mesh(ig, im); ico.position.set(-16, 8, 0); scene.add(ico);
-    let sc = 0, m3 = { x: 0, y: 0 };
-    window.addEventListener('scroll', () => sc = scrollY);
-    document.addEventListener('mousemove', e => { m3.x = (e.clientX / innerWidth - .5) * 2; m3.y = -(e.clientY / innerHeight - .5) * 2; });
-    window.addEventListener('resize', () => { cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-    (function a3() {
-      requestAnimationFrame(a3);
-      const t = Date.now() * .001;
-      pts.rotation.y = t * .04; pts.rotation.x = t * .015;
-      tor.rotation.x = t * .28; tor.rotation.y = t * .46;
-      ico.rotation.x = t * .18; ico.rotation.y = t * .32;
-      cam.position.y = -sc * .01; cam.position.x = m3.x * 1.2;
-      cam.lookAt(scene.position); renderer.render(scene, cam);
-    })();
 
     // Scroll reveal
-    const obs = new IntersectionObserver(entries => entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 70); obs.unobserve(e.target); } }), { threshold: .06 });
+    const obs = new IntersectionObserver(entries => entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 70);
+        obs.unobserve(e.target);
+      }
+    }), { threshold: .06 });
+
     document.querySelectorAll('.fade-in').forEach(f => obs.observe(f));
 
     // Skill bars
-    const skObs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.querySelectorAll('.sk-fill').forEach(b => b.style.width = b.dataset.w); }), { threshold: .3 });
+    const skObs = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.sk-fill').forEach(b => b.style.width = b.dataset.w);
+      }
+    }), { threshold: .3 });
+
     document.querySelectorAll('.sk-cat').forEach(c => skObs.observe(c));
 
     // Charts
-    Chart.defaults.color = 'rgba(180,200,255,0.5)';
-    Chart.defaults.font.family = "'DM Mono',monospace";
-    Chart.defaults.font.size = 9;
+    if (window.Chart) {
+      Chart.defaults.color = 'rgba(180,200,255,0.5)';
+      Chart.defaults.font.family = "'DM Mono',monospace";
+      Chart.defaults.font.size = 9;
 
-    // Performance bar
-    new Chart(document.getElementById('perfChart').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Stream Dashboard', 'T20 Analytics', 'Revenue Analysis', 'House Price', 'RAG System', 'Football Tracker'],
-        datasets: [{
-          label: 'Key Metric (%)',
-          data: [40, 25, 30, 87, 92, 89],
-          backgroundColor: ['rgba(0,212,255,0.65)', 'rgba(180,74,255,0.65)', 'rgba(15,255,179,0.65)', 'rgba(0,212,255,0.65)', 'rgba(180,74,255,0.65)', 'rgba(15,255,179,0.65)'],
-          borderRadius: 2, borderSkipped: false
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 8 } } }, y: { grid: { color: 'rgba(100,150,255,0.06)' }, ticks: { font: { size: 8 } } } } }
-    });
+      const perf = document.getElementById('perfChart');
+      if (perf) {
+        new Chart(perf.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Stream Dashboard', 'T20 Analytics', 'Revenue Analysis', 'House Price', 'RAG System', 'Football Tracker'],
+            datasets: [{
+              label: 'Key Metric (%)',
+              data: [40, 25, 30, 87, 92, 89],
+              backgroundColor: [
+                'rgba(0,212,255,0.65)',
+                'rgba(180,74,255,0.65)',
+                'rgba(15,255,179,0.65)',
+                'rgba(0,212,255,0.65)',
+                'rgba(180,74,255,0.65)',
+                'rgba(15,255,179,0.65)'
+              ],
+              borderRadius: 2, borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 8 } } },
+              y: { grid: { color: 'rgba(100,150,255,0.06)' }, ticks: { font: { size: 8 } } }
+            }
+          }
+        });
+      }
 
-    // Radar
-    new Chart(document.getElementById('radarChart').getContext('2d'), {
-      type: 'radar',
-      data: {
-        labels: ['Python', 'SQL', 'Power BI', 'ML', 'CV', 'NLP/RAG'],
-        datasets: [{ data: [95, 92, 88, 88, 82, 80], borderColor: '#b44aff', backgroundColor: 'rgba(180,74,255,0.1)', borderWidth: 1.5, pointRadius: 2, pointBackgroundColor: '#b44aff' }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { grid: { color: 'rgba(100,150,255,0.1)' }, angleLines: { color: 'rgba(100,150,255,0.1)' }, pointLabels: { color: 'rgba(180,200,255,0.6)', font: { size: 8 } }, ticks: { display: false }, min: 60 } } }
-    });
+      const radar = document.getElementById('radarChart');
+      if (radar) {
+        new Chart(radar.getContext('2d'), {
+          type: 'radar',
+          data: {
+            labels: ['Python', 'SQL', 'Power BI', 'ML', 'CV', 'NLP/RAG'],
+            datasets: [{
+              data: [95, 92, 88, 88, 82, 80],
+              borderColor: '#b44aff',
+              backgroundColor: 'rgba(180,74,255,0.1)',
+              borderWidth: 1.5,
+              pointRadius: 2,
+              pointBackgroundColor: '#b44aff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              r: {
+                grid: { color: 'rgba(100,150,255,0.1)' },
+                angleLines: { color: 'rgba(100,150,255,0.1)' },
+                pointLabels: { color: 'rgba(180,200,255,0.6)', font: { size: 8 } },
+                ticks: { display: false },
+                min: 60
+              }
+            }
+          }
+        });
+      }
 
-    // Skill horizontal bar
-    new Chart(document.getElementById('skillChart').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Python', 'SQL', 'Power BI', 'EDA', 'ML', 'Streamlit', 'CV', 'NLP'],
-        datasets: [{
-          data: [95, 92, 88, 90, 88, 85, 82, 80],
-          backgroundColor: 'rgba(0,212,255,0.55)',
-          borderRadius: 2, borderSkipped: false
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(100,150,255,0.06)' }, max: 100, ticks: { font: { size: 8 } } }, y: { grid: { display: false }, ticks: { font: { size: 8 } } } } }
-    });
+      const skill = document.getElementById('skillChart');
+      if (skill) {
+        new Chart(skill.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Python', 'SQL', 'Power BI', 'EDA', 'ML', 'Streamlit', 'CV', 'NLP'],
+            datasets: [{
+              data: [95, 92, 88, 90, 88, 85, 82, 80],
+              backgroundColor: 'rgba(0,212,255,0.55)',
+              borderRadius: 2,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(100,150,255,0.06)' }, max: 100, ticks: { font: { size: 8 } } },
+              y: { grid: { display: false }, ticks: { font: { size: 8 } } }
+            }
+          }
+        });
+      }
+    }
   </script>
 
   <!-- EmailJS contact form handler — must come after EmailJS CDN is loaded -->
@@ -2166,3 +906,4 @@
 </body>
 
 </html>
+
